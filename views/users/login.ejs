@@ -1,0 +1,26 @@
+<% layout("layouts/boilerplate") %> 
+<style>
+     .vertical-center {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+</style>
+<div class="row justify-content-center">
+    <div class="col-lg-6 mt-5">
+        <h3 class="mb-4 text-center">Log in</h3>
+        <form novalidate class="needs-validation mb-2" method="POST" action="/login">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Log in</button>
+        </form>
+        <a href="/register" class="link-dark">New user? Register</a>
+    </div>
+</div>

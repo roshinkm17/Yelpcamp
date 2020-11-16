@@ -1,0 +1,156 @@
+<% layout('layouts/boilerplate') %> 
+<script>
+    const campgrounds = {features: <%-JSON.stringify(campgrounds)%>};
+</script>
+<style>
+    img{
+        height: 300px;
+        object-fit: cover;
+    }
+</style>
+<div id="map" style="height: 400px;" class="mb-3">
+
+</div>
+<div class="row">
+    <% for( let index = 0; index <campgrounds.length; index++ ) { %>
+        <div class="col-md-6 col-xs-12 col-lg-6">
+            <div class="card mb-5"> 
+                <% if (campgrounds[index].images.length > 0) { %>
+                    <img src="<%= campgrounds[index].images[0].url%>"  class="card-img-top" alt="...">
+                    <% } else { %>
+                    <img src="https://images.unsplash.com/photo-1487730116645-74489c95b41b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"  class="card-img-top" alt="...">
+                <% } %> 
+                <div class="card-body">
+                    <h5 class="card-title"><%= campgrounds[index].title%> </h5>
+                    <p class="text-muted small"><%= campgrounds[index].location %> </p>
+                    <a class="btn btn-primary" href="/campgrounds/<%= campgrounds[index].id %>">View</a>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+<script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+<script>
+    mapboxgl.accessToken = '<%-process.env.MAPBOX_TOKEN%>';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [-103.59179687498357, 40.66995747013945],
+            zoom: 3
+        });
+
+        map.on('load', function () {
+            // Add a new source from our GeoJSON data and
+            // set the 'cluster' option to true. GL-JS will
+            // add the point_count property to your source data.
+            map.addSource('campgrounds', {
+                type: 'geojson',
+                // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
+                // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+                data:campgrounds,
+                cluster: true,
+                clusterMaxZoom: 14, // Max zoom to cluster points on
+                clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+            });
+
+            map.addLayer({
+                id: 'clusters',
+                type: 'circle',
+                source: 'campgrounds',
+                filter: ['has', 'point_count'],
+                paint: {
+                    // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+                    // with three steps to implement three types of circles:
+                    //   * Blue, 20px circles when point count is less than 100
+                    //   * Yellow, 30px circles when point count is between 100 and 750
+                    //   * Pink, 40px circles when point count is greater than or equal to 750
+                    'circle-color': [
+                        'step',
+                        ['get', 'point_count'],
+                        'lightgreen',
+                        10,
+                        'skyblue',
+                        30,
+                        'orange'
+                    ],
+                    'circle-radius': [
+                        'step',
+                        ['get', 'point_count'],
+                        20,
+                        10,
+                        30,
+                        30,
+                        40
+                    ]
+                }
+            });
+
+            map.addLayer({
+                id: 'cluster-count',
+                type: 'symbol',
+                source: 'campgrounds',
+                filter: ['has', 'point_count'],
+                layout: {
+                    'text-field': '{point_count_abbreviated}',
+                    'text-font': ['DIN Offc Pro Bold', 'Arial Unicode MS Bold'],
+                    'text-size': 14
+                }
+            });
+
+            map.addLayer({
+                id: 'unclustered-point',
+                type: 'circle',
+                source: 'campgrounds',
+                filter: ['!', ['has', 'point_count']],
+                paint: {
+                    'circle-color': 'green',
+                    'circle-radius': 5,
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            // inspect a cluster on click
+            map.on('click', 'clusters', function (e) {
+                var features = map.queryRenderedFeatures(e.point, {
+                    layers: ['clusters']
+                });
+                var clusterId = features[0].properties.cluster_id;
+                map.getSource('campgrounds').getClusterExpansionZoom(
+                    clusterId,
+                    function (err, zoom) {
+                        if (err) return;
+
+                        map.easeTo({
+                            center: features[0].geometry.coordinates,
+                            zoom: zoom
+                        });
+                    }
+                );
+            });
+
+            // When a click event occurs on a feature in
+            // the unclustered-point layer, open a popup at
+            // the location of the feature, with
+            // description HTML from its properties.
+            map.on('click', 'unclustered-point', function (e) {
+                const text = e.features[0].properties.popupMarkup;
+                var coordinates = e.features[0].geometry.coordinates.slice();
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(text)
+                    .addTo(map);
+            });
+
+            map.on('mouseenter', 'clusters', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'clusters', function () {
+                map.getCanvas().style.cursor = '';
+            });
+        });
+</script>

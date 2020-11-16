@@ -1,0 +1,52 @@
+<% layout('layouts/boilerplate') %>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <h1 class="display-6 text-center mb-5">Edit Campground</h1>
+        <form enctype="multipart/form-data" action="/campgrounds/<%= campground.id %>?_method=PUT" method="POST"
+            novalidate class="needs-validation mb-4">
+            <div class="mb-3">
+                <label for="title" class="form-label">Camp name</label>
+                <input type="text" class="form-control" id="title" name="title" value="<%= campground.title%> "
+                    required>
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="location" name="location" value="<%= campground.location%> "
+                    required>
+            </div>
+            <label for="price" class="form-label">Price</label>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="price">$</span>
+                <input type="text" class="form-control" name="price" placeholder="0.00" aria-label="Price"
+                    aria-describedby="price" value="<%= campground.price%>" required>
+            </div>
+            <div class="mb-3">
+                <label for="decsription" class="form-label">Description</label>
+                <textarea class="form-control" required aria-label="description"
+                    name="description"><%= campground.description %> </textarea>
+            </div>
+            <div class="mb-3">
+                <label for="formFile" class="form-label">Add Images</label>
+                <input class="form-control" type="file" id="formFile" name="image" multiple>
+            </div>
+            <div class="alert alert-warning mb-3" role="alert">
+               Check to delete image
+            </div>
+            <div class="row mb-3">
+                <%  campground.images.forEach((img, i) => { %>
+                <div class="col-lg-3 col-sm-4">
+                    <div class="card m-1">
+                        <img src="<%= img.url %>" alt="" class="img-thumbnail rounded card-image">
+                        <div class="card-img-overlay">
+                            <input class="form-check-input" type="checkbox" value="<%= img.fileName %>" id="flexCheckDefault"
+                                id="image-<%= i %>" name="deleteImages[]">
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+            <button type="submit" class="btn btn-success bg-gradient">Update</button>
+            <a class="btn btn-outline-secondary ml-2" href="/campgrounds/<%= campground.id %>">Go back</a>
+        </form>
+    </div>
+</div>

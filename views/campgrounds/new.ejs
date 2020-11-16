@@ -1,0 +1,32 @@
+<% layout('layouts/boilerplate') %>
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-4">
+        <h1 class="display-6 text-center mb-5">New Campground</h1>
+        <form action="/campgrounds/" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Camp name</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+            <label for="price" class="form-label">Price</label>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="price">$</span>
+                <input type="text" class="form-control" name="price" placeholder="0.00" required aria-label="Price"
+                    aria-describedby="price">
+            </div>
+            <div class="mb-3">
+                <label for="decsription" class="form-label">Description</label>
+                <textarea class="form-control" aria-label="description" name="description" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="formFile" class="form-label">Select Image</label>
+                <input class="form-control" type="file" id="formFile" name="image" multiple>
+            </div>
+            <button type="submit" class="btn btn-success bg-gradient">Create</button>
+            <a class="btn btn-outline-secondary ml-2" href="/campgrounds">Go back</a>
+        </form>
+    </div>
+</div>
