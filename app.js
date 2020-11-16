@@ -43,7 +43,6 @@ const sessionConfig = {
 		maxAge: 1000 * 60 * 60 * 24 * 7,
 	},
 };
-const dbUrl = process.env.DB_URL;
 const scriptSrcUrls = [
 	"https://stackpath.bootstrapcdn.com/",
 	"https://api.tiles.mapbox.com/",
